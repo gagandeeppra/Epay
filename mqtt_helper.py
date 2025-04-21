@@ -89,14 +89,14 @@ class MqttHelper:
         if self.on_subscribe_callback:
             self.on_subscribe_callback(self, message_id)
 
-    def on_publish(self, message_id):
+    def on_publish(self, mqtt_client, userdata, message_id):
         """Handle MQTT publish acknowledgment."""
         if self.on_publish_callback:
             self.on_publish_callback(self, message_id)
 
-    def on_message(self, message, userdata, flags):
+    def on_message(self, mqtt_client, userdata, message):
         """Handle incoming MQTT messages."""
-        payload = message.payload.decode("utf-8")
+        payload = str(message.payload, 'utf-8')
         topic_parts = message.topic.split("/")
 
         if len(topic_parts) == 3 and topic_parts[1] == self.serial_number and topic_parts[2] == "connected":

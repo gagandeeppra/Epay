@@ -41,7 +41,7 @@ def handle_connected_topic(mqtt, company_code, serial_number):
     """
     if serial_number not in devices_published_to:
         devices_published_to.append(serial_number)
-        mqtt.publish(f'{company_code}/{serial_number}/aboutdevice/request', payload='', qos=2)
+        mqtt.publish(f'{company_code}/{serial_number}/aboutdevice/request', '', 2)
 
 
 def handle_aboutdevice_response(serial_number, message):
