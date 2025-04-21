@@ -1,12 +1,9 @@
 import argparse
 import json
-
 from mqtt_helper import MqttHelper
 
 # Keep track of the list of devices that have already been published to or received from.
-devices_published_to = []
-devices_received_from = []
-
+devices_published_to, devices_received_from, devices_info = [],[],[]
 
 def on_connect(mqtt):
     mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/connected', 2)
@@ -26,8 +23,10 @@ def on_message(mqtt, topic, message):
     elif len(topic_split) == 4 and topic_split[2] == 'aboutdevice' and topic_split[3] == 'response' and serial_number not in devices_received_from:
         devices_received_from.append(serial_number)
         users = json.loads(message).get("users")
-        print(f'{serial_number}: {users}')
-
+         # Append the serial_number and users to the devices_info list
+        devices_info.append({"serial_number": serial_number, "users": users})
+        # print(f'{serial_number}: {users}')
+    print(devices_info)
 
 if __name__ == '__main__':
     # Parse the command line arguments.
