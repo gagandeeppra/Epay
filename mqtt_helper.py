@@ -67,7 +67,7 @@ class MqttHelper:
             self.disconnect()
             sys.exit(0)
 
-    def on_connect(self, mqtt_client):
+    def on_connect(self, mqtt_client, userdata, flags, rc):
         """Handle MQTT connection."""
         print("Connected")
         if self.on_connect_callback:
@@ -84,7 +84,7 @@ class MqttHelper:
         elif rc != mqtt.MQTT_ERR_SUCCESS:
             print(f"Disconnected with result code: {error_string(rc)}")
 
-    def on_subscribe(self,  message_id):
+    def on_subscribe(self,  message_id, userdata, flags, rc):
         """Handle MQTT subscription acknowledgment."""
         if self.on_subscribe_callback:
             self.on_subscribe_callback(self, message_id)
@@ -94,7 +94,7 @@ class MqttHelper:
         if self.on_publish_callback:
             self.on_publish_callback(self, message_id)
 
-    def on_message(self, message):
+    def on_message(self, message, userdata, flags):
         """Handle incoming MQTT messages."""
         payload = message.payload.decode("utf-8")
         topic_parts = message.topic.split("/")

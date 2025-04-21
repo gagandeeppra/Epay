@@ -13,8 +13,8 @@ def on_connect(mqtt):
     Callback function for MQTT connection.
     Subscribes to necessary topics.
     """
-    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/connected', qos=2)
-    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/aboutdevice/response', qos=2)
+    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/connected', 2)
+    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/aboutdevice/response', 2)
 
 
 def on_message(mqtt, topic, message):
