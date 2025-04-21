@@ -29,7 +29,7 @@ class MqttHelper:
 
         # Epay.
         if self.product_flavor == 'EPAY':
-            self.mqtt_client.tls_set(ca_certs='epay/epay_intermediate_certificate_authority.cer', certfile='epay/client/epay_client_certificate.cer', keyfile='epay/client/epay_client_certificate.key', cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS, ciphers=None)
+            self.mqtt_client.tls_set(ca_certs='certificate/epay_intermediate_certificate_authority.cer', certfile='certificate/client/epay_client_certificate.cer', keyfile='certificate/client/epay_client_certificate.key', cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS, ciphers=None)
             self.mqtt_client.connect('mqttbroker.sekureid.com', 8883, 60)
 
         # Loop indefinitely until the user presses the 'enter' button.
