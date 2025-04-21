@@ -19,14 +19,12 @@ def on_message(mqtt, topic, message):
     if len(topic_split) == 3 and topic_split[2] == 'connected' and serial_number not in devices_published_to:
         devices_published_to.append(serial_number)
         mqtt.publish(f'{company_code}/{serial_number}/aboutdevice/request', '', 2)
-
     elif len(topic_split) == 4 and topic_split[2] == 'aboutdevice' and topic_split[3] == 'response' and serial_number not in devices_received_from:
         devices_received_from.append(serial_number)
         users = json.loads(message).get("users")
          # Append the serial_number and users to the devices_info list
         devices_info.append({"serial_number": serial_number, "users": users})
         # print(f'{serial_number}: {users}')
-    print(devices_info)
 
 if __name__ == '__main__':
     # Parse the command line arguments.
