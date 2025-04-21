@@ -1,0 +1,13 @@
+.venv/
+certificate/
+.vscode/launch.json
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.egg-info/
+*.egg
+*.log
+*.coverage
