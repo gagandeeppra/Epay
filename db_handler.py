@@ -37,7 +37,7 @@ class DatabaseHandler:
         """
         Process a single row from the stored procedure result.
         """
-        self.asset_id = row["AssetID"]
+        self.asset_id = row["SerialNo"]
         site_id = row['SiteID']
         site_group_id = row['SiteGroupId']
 

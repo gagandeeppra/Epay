@@ -60,6 +60,15 @@ Handles API interactions to fetch device serial numbers.
     export API_URL=<your-api-url>
     export EMPLOYER_ID=<your-employer-id>
     export FILE_NAME=<your-csv-file-name>
+    export SERVER_NAME="vca-sqlmi-nonprod02.a225d02c8302.database.windows.net"
+    export DATABASE_NAME="RM"
+    export USER="gpratihar"
+    export PASSWORD="Passw0rd@12345"
+    export PROC_NAME="getasset"
+    export EMPLOYER_ID="227999"
+    export API_URL = "https://nexd.epaysystems.com/employee/v1/TimeClockEmployee/Employees"
+    export FILE_NAME="mqtt_extract.csv"
+    export TABLE_NAME="SecureIDClockVarification"
 
 ### Usage
 1. Run the Application: Execute the main.py file:
