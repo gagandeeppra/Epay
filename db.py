@@ -1,63 +1,104 @@
 import os
-from pymssql import _mssql
 import requests
+from pymssql import _mssql
+import json
 
-def execute_stored_proc(server, user, password, database):
-    conn = _mssql.connect(server=server, user=user, password=password, database=database)
-    conn.execute_query('getasset')
-    site_group_list = []
-    for row in conn:
+
+class DatabaseProcessor:
+    def __init__(self, server, user, password, database, employer_id, api_url):
+        """
+        Initialize the DatabaseProcessor with connection parameters and configurations.
+        """
+        self.server = server
+        self.user = user
+        self.password = password
+        self.database = database
+        self.employer_id = employer_id
+        self.api_url = api_url
+
+    def execute_stored_proc(self, proc_name):
+        """
+        Execute a stored procedure and process the results.
+        """
+        try:
+            with _mssql.connect(server=self.server, user=self.user, password=self.password, database=self.database) as conn:
+                conn.execute_query(proc_name)
+                for row in conn:
+                    self._process_row(conn, row)
+        except _mssql.MssqlDatabaseException as e:
+            print(f"Database error occurred: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+    def _process_row(self, conn, row):
+        """
+        Process a single row from the stored procedure result.
+        """
         print(f"AssetID={row['AssetID']}, SerialNo={row['SerialNo']}, SiteID={row['SiteID']}, SiteGroupId={row['SiteGroupId']}")
         site_id = row['SiteID']
         site_group_id = row['SiteGroupId']
+
         if site_id == 0 and site_group_id is None:
-            save_to_db(site_id)
+            self._save_to_db([site_id])
         else:
-            conn.execute_query(f'usp_NEXD_GetSiteGroupSites @sitegroupID={site_group_id}')
-            for row in conn:
-                site_group_list.append(row["siteid"])
-            save_to_db(site_group_list)
+            site_group_list = self._get_site_group_sites(conn, site_group_id)
+            self._save_to_db(site_group_list)
 
-def prepare_employer_site_list(list_site_id):
-    employers_site_list  = []
-    for site_id in list_site_id:
-        employer_site_obj = {
-            "employerId" : EMPLOYER_ID,
-            "siteId": site_id
+    def _get_site_group_sites(self, conn, site_group_id):
+        """
+        Retrieve site group sites using a stored procedure.
+        """
+        site_group_list = []
+        conn.execute_query(f'usp_NEXD_GetSiteGroupSites @sitegroupID={site_group_id}')
+        for row in conn:
+            site_group_list.append(row["siteid"])
+        return site_group_list
+
+    def _prepare_employer_site_list(self, site_ids):
+        """
+        Prepare a list of employer site objects.
+        """
+        return [{"employerId": self.employer_id, "siteId": site_id} for site_id in site_ids]
+
+    def _prepare_request_object(self, site_ids):
+        """
+        Prepare the request object for the API call.
+        """
+        return {
+            "employersSitesList": self._prepare_employer_site_list(site_ids),
+            "lookBackWindowsInMinutes": -1,
+            "managerIdList": [{"employeeId": 0}],
+            "processId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         }
-        employers_site_list.append(employer_site_obj)
-    return employers_site_list
 
-def prepare_request_object(list_site_id):    
-    request_object = {
-                        "employersSitesList": prepare_employer_site_list(list_site_id),
-                        "lookBackWindowsInMinutes": 0,
-                        "managerIdList": [
-                            {
-                            "employeeId": 0
-                            }
-                        ],
-                        "processId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                    }
-    return request_object
-
-def save_to_db(list_site_id):
-    try:
-        # Make a call to POST to save in the DB
-        response = requests.post(API_URL, json= prepare_request_object(list_site_id))
-        if response.status_code == "200":
-            print("Insert Successful")
-    except requests.exceptions.RequestException as e :
-        print(f"Some Error Occurred:{e}")
+    def _save_to_db(self, site_ids):
+        """
+        Save data to the database via an API call.
+        """
+        try:
+            response = requests.post(self.api_url, json=self._prepare_request_object(site_ids))
+            if response.status_code == 200:
+                output = json.loads(response.text)
+            else:
+                print(f"Failed to insert data. Status code: {response.status_code}, Response: {response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error occurred during API call: {e}")
 
 
 if __name__ == "__main__":
-    # Define the database connection parameters
+    # Load configuration from environment variables
     SERVER_NAME = os.environ.get("SERVER_NAME")
     DATABASE_NAME = os.environ.get("DATABASE_NAME")
-    USER = os.environ.get("USER")  # SQL Server login username
-    PASSWORD = os.environ.get("PASSWORD") # SQL Server login password
-    PROC_NAME = os.environ.get("PROC_NAME")
-    EMPLOYER_ID = int(os.environ.get("EMPLOYER_ID"))
+    USER = os.environ.get("USER")
+    PASSWORD = os.environ.get("PASSWORD")
+    PROC_NAME = os.environ.get("PROC_NAME", "getasset")
+    EMPLOYER_ID = int(os.environ.get("EMPLOYER_ID", 0))
     API_URL = os.environ.get("API_URL")
-    execute_stored_proc(SERVER_NAME,USER,PASSWORD,DATABASE_NAME)
+
+    # Validate required configurations
+    if not all([SERVER_NAME, DATABASE_NAME, USER, PASSWORD, EMPLOYER_ID, API_URL]):
+        print("Missing required environment variables. Please check your configuration.")
+    else:
+        # Initialize and execute the database processor
+        db_processor = DatabaseProcessor(SERVER_NAME, USER, PASSWORD, DATABASE_NAME, EMPLOYER_ID, API_URL)
+        db_processor.execute_stored_proc(PROC_NAME)
