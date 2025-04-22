@@ -43,7 +43,7 @@ class CSVHandler:
         if os.path.exists(self.file_name):
             try:
                 with open(self.file_name, 'r', newline='') as f:
-                    reader = csv.DictReader(f)
+                    reader = csv.reader(f)
                     for row in reader:
                         serial_numbers.append(row[0])
             except Exception as e:
