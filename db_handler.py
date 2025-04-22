@@ -26,7 +26,8 @@ class DatabaseHandler:
         try:
             with _mssql.connect(server=self.server, user=self.user, password=self.password, database=self.database) as conn:
                 conn.execute_query(proc_name)
-                for row in conn:
+                rows = list(conn)
+                for row in rows:
                     self._process_row(conn, row)
         except _mssql.MssqlDatabaseException as e:
             print(f"Database error occurred: {e}")
