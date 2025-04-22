@@ -16,7 +16,7 @@ class DatabaseHandler:
         self.database = database
         self.api_url = api_url
         self.api_serial_number_list = []
-        self.mqtt_serial_number_list = []
+        self.mqtt_serial_number_list = CSVHandler().read_csv()
         self.table_name = table_name
 
     def execute_stored_proc(self, proc_name):
