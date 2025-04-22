@@ -2,6 +2,7 @@ import os
 import requests
 from pymssql import _mssql
 import json
+from csv_handler import CSVHandler
 
 
 class DatabaseProcessor:
@@ -81,6 +82,9 @@ class DatabaseProcessor:
                 employeeList = json.loads(response.text)["data"]["employeeList"]
                 device_serial_number  = [employee["employeeId"] for employee in employeeList]
                 #Perform csv and api comparison here
+                mqtt_serial_number = CSVHandler().read_csv()
+                unmatched_serial_number = list(set(mqtt_serial_number) - set(device_serial_number))
+                print(unmatched_serial_number)
                 # if not match insert into new table
             else:
                 print(f"Failed to insert data. Status code: {response.status_code}, Response: {response.text}")
