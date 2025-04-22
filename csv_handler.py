@@ -16,8 +16,9 @@ class CSVHandler:
         """
         try:
             with open(self.file_name, 'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerows({"serial_number": serial_number, "user_count": user_count})
+                csv_fields = ['serial_number', 'user_count']
+                writer = csv.DictWriter(f, fieldnames=csv_fields)
+                writer.writerow({"serial_number": serial_number, "user_count": user_count})
         except Exception as e:
             print(f"Error writing to CSV file: {e}")
 
