@@ -78,7 +78,10 @@ class DatabaseProcessor:
         try:
             response = requests.post(self.api_url, json=self._prepare_request_object(site_ids))
             if response.status_code == 200:
-                output = json.loads(response.text)
+                employeeList = json.loads(response.text)["data"]["employeeList"]
+                device_serial_number  = [employee["employeeId"] for employee in employeeList]
+                #Perform csv and api comparison here
+                # if not match insert into new table
             else:
                 print(f"Failed to insert data. Status code: {response.status_code}, Response: {response.text}")
         except requests.exceptions.RequestException as e:
