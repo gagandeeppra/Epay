@@ -63,12 +63,11 @@ class DatabaseHandler:
         """
         try:
             with _mssql.connect(server=self.server, user=self.user, password=self.password, database=self.database) as conn:
-                # Fetch API Device Number Count
                 # Fetch MQTT Device Number Count
                 # Diff
                 difference = len(self.mqtt_serial_number_list) - len(self.api_serial_number_list)
-                sql = f"INSERT INTO {self.table_name} (SerialNo, MQTTEmployeeno, DatabaseEmoNo, Diff) VALUES ({self.asset_id}, {self.mqtt_serial_number_list}, {self.api_serial_number_list}, {difference})"
-                conn.execute(sql)
+                sql = f"INSERT INTO {self.table_name} (SerialNo, MQTTEmployeeno, DatabaseEmoNo, Diff) VALUES ({self.asset_id}, {len(self.mqtt_serial_number_list)}, {len(self.api_serial_number_list)}, {difference})"
+                conn.execute_query(sql)
                 # you must call commit() to persist your data if you don't set autocommit to True
                 conn.commit()
         except _mssql.MssqlDatabaseException as e:
