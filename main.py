@@ -13,8 +13,8 @@ def on_connect(mqtt):
     Callback function for MQTT connection.
     Subscribes to necessary topics.
     """
-    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/connected', 2)
-    mqtt.subscribe('6718874bc1628f9b0dcd1ee7/+/aboutdevice/response', 2)
+    mqtt.subscribe("6718874bc1628f9b0dcd1ee7/+/connected", 2)
+    mqtt.subscribe("6718874bc1628f9b0dcd1ee7/+/aboutdevice/response", 2)
 
 
 def on_message(mqtt, topic, message):
@@ -22,13 +22,17 @@ def on_message(mqtt, topic, message):
     Callback function for handling incoming MQTT messages.
     Processes messages based on the topic structure.
     """
-    topic_split = topic.split('/')
+    topic_split = topic.split("/")
     company_code = topic_split[0]
     serial_number = topic_split[1]
 
-    if len(topic_split) == 3 and topic_split[2] == 'connected':
+    if len(topic_split) == 3 and topic_split[2] == "connected":
         handle_connected_topic(mqtt, company_code, serial_number)
-    elif len(topic_split) == 4 and topic_split[2] == 'aboutdevice' and topic_split[3] == 'response':
+    elif (
+        len(topic_split) == 4
+        and topic_split[2] == "aboutdevice"
+        and topic_split[3] == "response"
+    ):
         handle_aboutdevice_response(serial_number, message)
 
 
@@ -39,7 +43,7 @@ def handle_connected_topic(mqtt, company_code, serial_number):
     """
     if serial_number not in devices_published_to:
         devices_published_to.append(serial_number)
-        mqtt.publish(f'{company_code}/{serial_number}/aboutdevice/request', '', 2)
+        mqtt.publish(f"{company_code}/{serial_number}/aboutdevice/request", "", 2)
 
 
 def handle_aboutdevice_response(serial_number, message):
@@ -62,7 +66,7 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description="MQTT Device Manager")
     parser.add_argument(
-        '-pf', '--product-flavor', required=True, help='The product flavor'
+        "-pf", "--product-flavor", required=True, help="The product flavor"
     )
     return parser.parse_args()
 
@@ -76,9 +80,9 @@ def main():
     MqttHelper(
         on_connect_callback=on_connect,
         product_flavor=args.product_flavor,
-        on_message_callback=on_message
+        on_message_callback=on_message,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

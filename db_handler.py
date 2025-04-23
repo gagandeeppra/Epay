@@ -4,6 +4,7 @@ from csv_handler import CSVHandler
 from api_handler import APIHandler
 import time
 
+
 class DatabaseHandler:
     def __init__(self, server, user, password, database, api_url, table_name):
         """
@@ -32,7 +33,7 @@ class DatabaseHandler:
                 server=self.server,
                 user=self.user,
                 password=self.password,
-                database=self.database
+                database=self.database,
             )
         return self._connection_instance
 
@@ -56,15 +57,19 @@ class DatabaseHandler:
         Process a single row from the stored procedure result.
         """
         self.asset_id = row["SerialNo"]
-        site_id = row['SiteID']
-        site_group_id = row['SiteGroupId']
+        site_id = row["SiteID"]
+        site_group_id = row["SiteGroupId"]
 
         if site_id == 0 and site_group_id is None:
-            self.api_serial_number_list = APIHandler().fetch_device_serial_numbers([site_id])
+            self.api_serial_number_list = APIHandler().fetch_device_serial_numbers(
+                [site_id]
+            )
         else:
             site_group_list = self._get_site_group_sites(conn, site_group_id)
-            self.api_serial_number_list = APIHandler().fetch_device_serial_numbers(site_group_list)
-        
+            self.api_serial_number_list = APIHandler().fetch_device_serial_numbers(
+                site_group_list
+            )
+
         self._save_to_db()
 
     def _get_site_group_sites(self, conn, site_group_id):
@@ -72,7 +77,7 @@ class DatabaseHandler:
         Retrieve site group sites using a stored procedure.
         """
         site_group_list = []
-        conn.execute_query(f'usp_NEXD_GetSiteGroupSites @sitegroupID={site_group_id}')
+        conn.execute_query(f"usp_NEXD_GetSiteGroupSites @sitegroupID={site_group_id}")
         for row in conn:
             site_group_list.append(row["siteid"])
         return site_group_list
@@ -83,7 +88,9 @@ class DatabaseHandler:
         """
         try:
             conn = self.get_db_connection()
-            difference = len(self.mqtt_serial_number_list) - len(self.api_serial_number_list)
+            difference = len(self.mqtt_serial_number_list) - len(
+                self.api_serial_number_list
+            )
             sql = (
                 f"INSERT INTO {self.table_name} "
                 f"(SerialNo, MQTTEmployeeno, DatabaseEmoNo, Diff) "
@@ -110,7 +117,9 @@ if __name__ == "__main__":
 
     # Validate required configurations
     if not all([SERVER_NAME, DATABASE_NAME, USER, PASSWORD, API_URL, TABLE_NAME]):
-        print("Missing required environment variables. Please check your configuration.")
+        print(
+            "Missing required environment variables. Please check your configuration."
+        )
     else:
         # Initialize and execute the database handler
         db_handler = DatabaseHandler(
@@ -119,8 +128,8 @@ if __name__ == "__main__":
             password=PASSWORD,
             database=DATABASE_NAME,
             api_url=API_URL,
-            table_name=TABLE_NAME
+            table_name=TABLE_NAME,
         )
         db_handler.execute_stored_proc(PROC_NAME)
         end_time = time.time()
-        print(f"Script takes:{end_time-start_time} seconds")
+        print(f"Script takes:{end_time - start_time} seconds")

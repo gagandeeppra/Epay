@@ -93,7 +93,9 @@ class MqttHelper:
         elif rc != mqtt.MQTT_ERR_SUCCESS:
             print(f"Disconnected with result code: {error_string(rc)}")
 
-    def on_subscribe(self, mqtt_client, userdata, message_id, granted_qos, properties=None):
+    def on_subscribe(
+        self, mqtt_client, userdata, message_id, granted_qos, properties=None
+    ):
         """
         Handle MQTT subscription acknowledgment.
         """
@@ -114,10 +116,16 @@ class MqttHelper:
         payload = message.payload.decode("utf-8")
         topic_parts = message.topic.split("/")
 
-        if len(topic_parts) == 3 and topic_parts[1] == self.serial_number and topic_parts[2] == "connected":
+        if (
+            len(topic_parts) == 3
+            and topic_parts[1] == self.serial_number
+            and topic_parts[2] == "connected"
+        ):
             self.company_code = topic_parts[0]
             if self.on_company_code_callback:
-                self.on_company_code_callback(self, self.company_code, self.serial_number)
+                self.on_company_code_callback(
+                    self, self.company_code, self.serial_number
+                )
             elif self.on_message_callback:
                 self.on_message_callback(self, message.topic, payload)
         elif self.on_message_callback:

@@ -11,7 +11,9 @@ class APIHandler:
         self.api_url = os.environ.get("API_URL")
         self.employer_id = os.environ.get("EMPLOYER_ID")
         if not self.api_url or not self.employer_id:
-            raise ValueError("API_URL and EMPLOYER_ID must be set as environment variables.")
+            raise ValueError(
+                "API_URL and EMPLOYER_ID must be set as environment variables."
+            )
 
     def fetch_device_serial_numbers(self, site_ids):
         """
@@ -67,7 +69,9 @@ class APIHandler:
         Returns:
             list: A list of employer site objects.
         """
-        return [{"employerId": self.employer_id, "siteId": site_id} for site_id in site_ids]
+        return [
+            {"employerId": self.employer_id, "siteId": site_id} for site_id in site_ids
+        ]
 
     def _prepare_request_object(self, site_ids):
         """
@@ -83,5 +87,5 @@ class APIHandler:
             "employersSitesList": self._prepare_employer_site_list(site_ids),
             "lookBackWindowsInMinutes": -1,
             "managerIdList": [{"employeeId": 0}],
-            "processId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            "processId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         }
