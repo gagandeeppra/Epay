@@ -2,13 +2,16 @@ import requests
 import json
 import os
 
+
 class APIHandler:
     def __init__(self):
         """
-        Initialize the APIHandler with the API URL.
+        Initialize the APIHandler with the API URL and employer ID.
         """
         self.api_url = os.environ.get("API_URL")
-        self.employer_id  = os.environ.get("EMPLOYER_ID")
+        self.employer_id = os.environ.get("EMPLOYER_ID")
+        if not self.api_url or not self.employer_id:
+            raise ValueError("API_URL and EMPLOYER_ID must be set as environment variables.")
 
     def fetch_device_serial_numbers(self, site_ids):
         """
@@ -27,7 +30,10 @@ class APIHandler:
             if response.status_code == 200:
                 return self._extract_device_serial_numbers(response)
             else:
-                print(f"API call failed. Status code: {response.status_code}, Response: {response.text}")
+                print(
+                    f"API call failed. Status code: {response.status_code}, "
+                    f"Response: {response.text}"
+                )
                 return []
         except requests.exceptions.RequestException as e:
             print(f"Error occurred during API call: {e}")
@@ -50,17 +56,28 @@ class APIHandler:
         except (json.JSONDecodeError, KeyError) as e:
             print(f"Error parsing API response: {e}")
             return []
-        
-    
+
     def _prepare_employer_site_list(self, site_ids):
         """
         Prepare a list of employer site objects.
+
+        Args:
+            site_ids (list): List of site IDs.
+
+        Returns:
+            list: A list of employer site objects.
         """
         return [{"employerId": self.employer_id, "siteId": site_id} for site_id in site_ids]
 
     def _prepare_request_object(self, site_ids):
         """
         Prepare the request object for the API call.
+
+        Args:
+            site_ids (list): List of site IDs.
+
+        Returns:
+            dict: The request payload for the API call.
         """
         return {
             "employersSitesList": self._prepare_employer_site_list(site_ids),
