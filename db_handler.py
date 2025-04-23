@@ -2,7 +2,7 @@ import os
 from pymssql import _mssql
 from csv_handler import CSVHandler
 from api_handler import APIHandler
-
+import time
 
 class DatabaseHandler:
     def __init__(self, server, user, password, database, api_url, table_name):
@@ -98,6 +98,7 @@ class DatabaseHandler:
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     # Load configuration from environment variables
     SERVER_NAME = os.environ.get("SERVER_NAME")
     DATABASE_NAME = os.environ.get("DATABASE_NAME")
@@ -121,4 +122,5 @@ if __name__ == "__main__":
             table_name=TABLE_NAME
         )
         db_handler.execute_stored_proc(PROC_NAME)
-        db_handler._save_to_db()
+        end_time = time.time()
+        print(f"Script takes:{end_time-start_time} seconds")

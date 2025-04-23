@@ -74,6 +74,7 @@ Handles API interactions to fetch device serial numbers.
 1. Run the Application: Execute the main.py file:
     ```bash
     python main.py -pf <product-flavor>
+    python db_handler.py
 
 2. CSV Operations:
     The csv_handler.py module automatically creates and updates the CSV file with device data.
