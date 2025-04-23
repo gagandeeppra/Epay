@@ -16,19 +16,22 @@ class CSVHandler:
                 "File name must be provided either as an argument "
                 "or through the FILE_NAME environment variable."
             )
+        self.csv_fields = ['serial_number', 'user_count']  # Define header fields
 
     def write_csv(self, serial_number, user_count):
         """
-        Append a row to the CSV file.
+        Append a row to the CSV file. If the file does not exist, it creates the file with headers.
 
         Args:
             serial_number (str): The serial number to write.
             user_count (int): The user count to write.
         """
+        file_exists = os.path.exists(self.file_name)
         try:
             with open(self.file_name, 'a', newline='') as f:
-                csv_fields = ['serial_number', 'user_count']
-                writer = csv.DictWriter(f, fieldnames=csv_fields)
+                writer = csv.DictWriter(f, fieldnames=self.csv_fields)
+                if not file_exists:  # Write header if the file does not exist
+                    writer.writeheader()
                 writer.writerow({
                     "serial_number": serial_number,
                     "user_count": user_count
@@ -43,8 +46,7 @@ class CSVHandler:
         if not os.path.exists(self.file_name):
             try:
                 with open(self.file_name, 'w', newline='') as f:
-                    csv_fields = ['serial_number', 'user_count']
-                    writer = csv.DictWriter(f, fieldnames=csv_fields)
+                    writer = csv.DictWriter(f, fieldnames=self.csv_fields)
                     writer.writeheader()
             except Exception as e:
                 print(f"Error creating CSV file: {e}")
