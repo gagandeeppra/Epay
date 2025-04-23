@@ -39,18 +39,6 @@ class CSVHandler:
         except Exception as e:
             print(f"Error writing to CSV file: {e}")
 
-    def create_csv(self):
-        """
-        Create the CSV file with headers if it does not exist.
-        """
-        if not os.path.exists(self.file_name):
-            try:
-                with open(self.file_name, 'w', newline='') as f:
-                    writer = csv.DictWriter(f, fieldnames=self.csv_fields)
-                    writer.writeheader()
-            except Exception as e:
-                print(f"Error creating CSV file: {e}")
-
     def read_csv(self):
         """
         Read the CSV file and return a list of serial numbers.
