@@ -57,15 +57,15 @@ Handles API interactions to fetch device serial numbers.
 
 3. Set up environment variables: Create a .env file or export the following variables:
     ```
-    export API_URL=<your-api-url>
-    export EMPLOYER_ID=<your-employer-id>
-    export FILE_NAME=<your-csv-file-name>
-    export SERVER_NAME="vca-sqlmi-nonprod02.a225d02c8302.database.windows.net"
-    export DATABASE_NAME="RM"
-    export USER="gpratihar"
-    export PASSWORD="Passw0rd@12345"
+    export API_URL=xxxxxxxx
+    export EMPLOYER_ID=xxxxxxxx
+    export FILE_NAME=xxxxxxxx
+    export SERVER_NAME=xxxxxxxx
+    export DATABASE_NAME=xxxxxxxx
+    export USER=xxxxxxxx
+    export PASSWORD=xxxxxxxx
     export PROC_NAME="getasset"
-    export EMPLOYER_ID="227999"
+    export EMPLOYER_ID=xxxxxxxx
     export API_URL = "https://nexd.epaysystems.com/employee/v1/TimeClockEmployee/Employees"
     export FILE_NAME="mqtt_extract.csv"
     export TABLE_NAME="SecureIDClockVarification"
