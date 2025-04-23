@@ -63,8 +63,8 @@ class CSVHandler:
             try:
                 with open(self.file_name, 'r', newline='') as f:
                     reader = csv.DictReader(f)
-                    for row in reader:
-                        serial_numbers.append(row['serial_number'])
+                    # Use a generator expression to efficiently extract serial numbers
+                    serial_numbers = [row['serial_number'] for row in reader]
             except Exception as e:
                 print(f"Error reading CSV file: {e}")
         else:
