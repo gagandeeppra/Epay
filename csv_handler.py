@@ -6,8 +6,11 @@ class CSVHandler:
     def __init__(self, file_name=None):
         """
         Initialize the CSVHandler with the file name.
+        Ensures the file is created inside the 'data' folder.
         """
-        self.file_name = file_name or os.environ.get("FILE_NAME")
+        self.data_folder = "data"
+        os.makedirs(self.data_folder, exist_ok=True)  # Create 'data' folder if it doesn't exist
+        self.file_name = os.path.join(self.data_folder, file_name or os.environ.get("FILE_NAME"))
         if not self.file_name:
             raise ValueError(
                 "File name must be provided either as an argument "

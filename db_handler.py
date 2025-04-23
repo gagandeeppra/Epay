@@ -18,22 +18,34 @@ class DatabaseHandler:
         self.api_serial_number_list = []
         self.mqtt_serial_number_list = CSVHandler().read_csv()
         self.table_name = table_name
+        self._connection_instance = None
+
+    def get_db_connection(self):
+        """
+        Get a singleton database connection.
+
+        Returns:
+            _mssql.Connection: A singleton database connection instance.
+        """
+        if self._connection_instance is None:
+            self._connection_instance = _mssql.connect(
+                server=self.server,
+                user=self.user,
+                password=self.password,
+                database=self.database
+            )
+        return self._connection_instance
 
     def execute_stored_proc(self, proc_name):
         """
         Execute a stored procedure and process the results.
         """
         try:
-            with _mssql.connect(
-                server=self.server,
-                user=self.user,
-                password=self.password,
-                database=self.database
-            ) as conn:
-                conn.execute_query(proc_name)
-                rows = list(conn)
-                for row in rows:
-                    self._process_row(conn, row)
+            conn = self.get_db_connection()
+            conn.execute_query(proc_name)
+            rows = list(conn)
+            for row in rows:
+                self._process_row(conn, row)
         except _mssql.MssqlDatabaseException as e:
             print(f"Database error occurred: {e}")
         except Exception as e:
@@ -68,20 +80,15 @@ class DatabaseHandler:
         Save data to the table.
         """
         try:
-            with _mssql.connect(
-                server=self.server,
-                user=self.user,
-                password=self.password,
-                database=self.database
-            ) as conn:
-                difference = len(self.mqtt_serial_number_list) - len(self.api_serial_number_list)
-                sql = (
-                    f"INSERT INTO {self.table_name} "
-                    f"(SerialNo, MQTTEmployeeno, DatabaseEmoNo, Diff) "
-                    f"VALUES ({self.asset_id}, {len(self.mqtt_serial_number_list)}, "
-                    f"{len(self.api_serial_number_list)}, {difference})"
-                )
-                conn.execute_query(sql)
+            conn = self.get_db_connection()
+            difference = len(self.mqtt_serial_number_list) - len(self.api_serial_number_list)
+            sql = (
+                f"INSERT INTO {self.table_name} "
+                f"(SerialNo, MQTTEmployeeno, DatabaseEmoNo, Diff) "
+                f"VALUES ({self.asset_id}, {len(self.mqtt_serial_number_list)}, "
+                f"{len(self.api_serial_number_list)}, {difference})"
+            )
+            conn.execute_query(sql)
         except _mssql.MssqlDatabaseException as e:
             print(f"Database error occurred: {e}")
         except Exception as e:
