@@ -86,7 +86,7 @@ Handles API interactions to fetch device serial numbers.
     *  paho-mqtt: For MQTT communication.
     *  requests: For API interactions.
     *  csv: For CSV file operations.
-    *  os: For environment variable handling.
+    *  pymssql: For SQL Server Operations.
 
 
 
