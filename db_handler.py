@@ -64,6 +64,8 @@ class DatabaseHandler:
         else:
             site_group_list = self._get_site_group_sites(conn, site_group_id)
             self.api_serial_number_list = APIHandler().fetch_device_serial_numbers(site_group_list)
+        
+        self._save_to_db()
 
     def _get_site_group_sites(self, conn, site_group_id):
         """
